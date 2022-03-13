@@ -489,6 +489,7 @@ AsToken         = "as"         !IdentifierPart
 BreakToken      = "break"      !IdentifierPart
 CalldataToken   = "calldata"   !IdentifierPart
 ConstantToken   = "constant"   !IdentifierPart
+OverrideToken   = "override"   !IdentifierPart
 ContinueToken   = "continue"   !IdentifierPart
 ContractToken   = "contract"   !IdentifierPart
 ConstructorToken   = "constructor"   !IdentifierPart
@@ -541,6 +542,7 @@ WeeksToken      = "weeks"      !IdentifierPart
 WeiToken        = "wei"        !IdentifierPart
 WhileToken      = "while"      !IdentifierPart
 YearsToken      = "years"      !IdentifierPart
+UncheckedToken  = "unchecked"  !IdentifierPart
 
 /* Skipped */
 
@@ -805,13 +807,13 @@ StorageLocationSpecifier
   / CalldataToken
 
 StateVariableSpecifiers
-  = specifiers:(VisibilitySpecifier __ ConstantToken?){
+  = specifiers:(VisibilitySpecifier __ ConstantToken? __ OverrideToken? __){
     return {
       visibility: specifiers[0][0],
       isconstant: specifiers[2] ? true: false 
     }
   }
-  / specifiers:(ConstantToken __ VisibilitySpecifier?){
+  / specifiers:(ConstantToken __ VisibilitySpecifier? __ OverrideToken? __){
     return {
       visibility: specifiers[2] ? specifiers[2][0] : null,
       isconstant: true
@@ -1087,6 +1089,7 @@ Statements
 
 Statement
   = Block
+  / UncheckedBlock
   / VariableStatement
   / EmptyStatement
   / ExpressionStatement
@@ -1103,6 +1106,16 @@ Statement
 
 Block
   = "{" __ body:(StatementList __)? "}" {
+      return {
+        type: "BlockStatement",
+        body: optionalList(extractOptional(body, 0)),
+        start: location().start.offset,
+        end: location().end.offset
+      };
+    }
+
+UncheckedBlock
+  = UncheckedToken __ "{" __ body:(StatementList __)? "}" {
       return {
         type: "BlockStatement",
         body: optionalList(extractOptional(body, 0)),
@@ -1508,7 +1521,7 @@ ModifierDeclaration
     }
 
 FunctionDeclaration
-  = FunctionToken __ fnname:FunctionName __ args:ModifierArgumentList? __ returns:ReturnsDeclarations __ body:FunctionBody
+  = FunctionToken __ fnname:FunctionName __ args:ModifierArgumentList? __ OverrideToken? __ returns:ReturnsDeclarations __ body:FunctionBody
     {
       return {
         type: "FunctionDeclaration",
@@ -1522,7 +1535,7 @@ FunctionDeclaration
         end: location().end.offset
       };
     }
-  / FunctionToken __ fnname:FunctionName __ args:ModifierArgumentList? __ returns:ReturnsDeclarations __ EOS
+  / FunctionToken __ fnname:FunctionName __ args:ModifierArgumentList?__ OverrideToken? __ returns:ReturnsDeclarations __ EOS
     {
       return {
         type: "FunctionDeclaration",

@@ -1,7 +1,7 @@
 {
-  "name": "solparse",
-  "version": "2.2.8",
-  "description": "PEG.js Solidity parser for Javascript",
+  "name": "solparse-0.8.0",
+  "version": "3.0.1",
+  "description": "PEG.js Solidity parser  for Javascript",
   "main": "index.js",
   "scripts": {
     "prepublish": "npm run build",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/duaraghav8/solparse.git"
+    "url": "git+https://github.com/ethkilla/solparse"
   },
   "bin": {
     "solidity-parser": "./cli.js"
